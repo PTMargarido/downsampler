@@ -14,17 +14,16 @@ class Downsampler
         vector<T> vecReturn;
         int nNextSegStartingIndex = 0;
         int nCounter = 0;
-        
+
         for (const auto& vec : buffer)
         {
             int nBufferSize = vec.size();
             int nDownSampleElements = 0;
 
-            for (int j = 0; j < (nBufferSize - nNextSegStartingIndex); j++)
-            {
-                if(!(j % m_nRate))
-                    nDownSampleElements++;
-            }
+            if (nBufferSize - nNextSegStartingIndex > 0)
+                nDownSampleElements++;
+
+            nDownSampleElements += (nBufferSize - nNextSegStartingIndex - 1) / m_nRate;
 
             for(int nIndex = 0; nIndex < nDownSampleElements; ++nIndex)
                 vecReturn.emplace_back(vec[nIndex*m_nRate + nNextSegStartingIndex]); 
@@ -37,10 +36,10 @@ class Downsampler
 
 int main ()
 {
-    Downsampler<int> ds(4);
+    Downsampler<int> ds(7);
 
-    vector<vector<int>> buffer{{}, {}, {}, {0,1,2,3,4}, {5,6}, {7}, {8,9,10,11,12}, {13,14}, {15,16,17,18},
-                               {19,20}, {21,22,23,24,25}, {26,27,28,29,30}, {31,32,33}};
+    vector<vector<int>> buffer{{0,1,2},{3,4,5,6,7,8,9,10,11,12}, {13,14}, {15,16,17,18},
+        {19,20}, {21,22,23,24,25}, {26,27,28,29,30}, {31,32,33}};
     vector<int> result = ds.downsample(buffer);
 
     cout << "Original vector: ";
